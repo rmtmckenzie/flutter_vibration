@@ -6,6 +6,8 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.media.AudioAttributes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import io.flutter.plugin.common.MethodCall;
@@ -13,6 +15,9 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public class VibrationPlugin implements MethodCallHandler {
     private final Vibrator vibrator;
@@ -74,7 +79,7 @@ public class VibrationPlugin implements MethodCallHandler {
         int[] intensitiesArray = new int[intensities.size()];
 
         for (int i = 0; i < patternLong.length; i++) {
-            patternLong[i] = pattern.get(i).intValue();
+            patternLong[i] = pattern.get(i);
         }
 
         for (int i = 0; i < intensitiesArray.length; i++) {
@@ -122,7 +127,34 @@ public class VibrationPlugin implements MethodCallHandler {
                 result.success(true);
 
                 break;
+            case "vibrate_duration": {
+                int duration = max(1, defautValue((Integer) call.argument("duration"), 500));
+                int intensity = max(1, min(255, defautValue((Integer) call.argument("intensity"), 255)));
+
+                if (duration > 1000 & duration % 1000 == 0) {
+                    int num = duration / 1000;
+
+                    List<Integer> pattern = new ArrayList<>();
+                    pattern.add(0);
+                    List<Integer> intensities = new ArrayList<>();
+                    intensities.add(0);
+                    for(int i = 0; i < num; ++i) {
+                        pattern.add(100);
+                        intensities.add(intensity);
+                        pattern.add(900);
+                        intensities.add(0);
+                    }
+
+                    vibrate(pattern, -1, intensities);
+                } else {
+                    vibrate(duration, intensity);
+                }
+
+                result.success(null);
+                break;
+            }
             case "vibrate":
+                //TODO
                 int duration = call.argument("duration");
                 List<Integer> pattern = call.argument("pattern");
                 int repeat = call.argument("repeat");
@@ -150,4 +182,9 @@ public class VibrationPlugin implements MethodCallHandler {
                 result.notImplemented();
         }
     }
+
+    private static int defautValue(Integer i, int defaultValue) {
+        return i == null ? defaultValue : i;
+    }
+
 }
