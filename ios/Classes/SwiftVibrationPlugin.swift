@@ -45,6 +45,8 @@ public class SwiftVibrationPlugin: NSObject, FlutterPlugin {
             case .idleTimeout: print("Idle timeout")
             case .systemError: print("System error")
             case .notifyWhenFinished: print("Playback finished")
+            case .engineDestroyed: print("Engine Destroyed")
+            case .gameControllerDisconnect: print("Game Controller Disconnect")
             @unknown default:
                 print("Unknown error")
             }
