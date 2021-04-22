@@ -14,7 +14,7 @@ class Vibration {
   ///   Vibration.vibrate();
   /// }
   /// ```
-  static Future<bool> hasVibrator() => _channel.invokeMethod("hasVibrator");
+  static Future<bool?> hasVibrator() => _channel.invokeMethod("hasVibrator");
 
   /// Check if the vibrator has amplitude control.
   ///
@@ -23,7 +23,8 @@ class Vibration {
   ///   Vibration.vibrate(amplitude: 128);
   /// }
   /// ```
-  static Future<bool> hasAmplitudeControl() => _channel.invokeMethod("hasAmplitudeControl");
+  static Future<bool?> hasAmplitudeControl() =>
+      _channel.invokeMethod("hasAmplitudeControl");
 
   /// Check if the device is able to vibrate with a custom
   /// [duration], [pattern] or [intensities].
@@ -38,7 +39,8 @@ class Vibration {
   ///   Vibration.vibrate();
   /// }
   /// ```
-  static Future<bool> hasCustomVibrationsSupport() => _channel.invokeMethod("hasCustomVibrationsSupport");
+  static Future<bool?> hasCustomVibrationsSupport() =>
+      _channel.invokeMethod("hasCustomVibrationsSupport");
 
   /// Vibrate with [duration] at [amplitude] or [pattern] at [intensities].
   ///
@@ -53,28 +55,24 @@ class Vibration {
   ///   Vibration.vibrate(duration: 1000, amplitude: 255);
   /// }
   /// ```
-  static Future<void> vibrate({
-    int duration,
-    List<int> pattern,
-    int repeat,
-    List<int> intensities,
-    int amplitude,
-  }) {
-    assert(pattern != null);
-    assert(intensities.length == 0 || intensities.length == pattern.length / 2);
-
-    return _channel.invokeMethod(
-      "vibrate",
-      {"duration": duration, "pattern": pattern, "repeat": repeat, "amplitude": amplitude, "intensities": intensities},
-    );
-  }
-
-  static Future<void> pattern(List<Intensity> pattern, {int repeat}) {
-    //TODO
-  }
+  static Future<void> vibrate(
+          {int duration = 500,
+          List<int> pattern = const [],
+          int repeat = -1,
+          List<int> intensities = const [],
+          int amplitude = -1}) =>
+      _channel.invokeMethod(
+        "vibrate",
+        {
+          "duration": duration,
+          "pattern": pattern,
+          "repeat": repeat,
+          "amplitude": amplitude,
+          "intensities": intensities
+        },
+      );
 
   static Future<void> forDuration(Duration duration, {int amplitude = 255}) {
-    assert(amplitude != null);
     assert(amplitude > 0 && amplitude < 256);
     return _channel.invokeMethod("vibrate_duration", {"duration": duration.inMilliseconds, "intensity": amplitude});
   }
